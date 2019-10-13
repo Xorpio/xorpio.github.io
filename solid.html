@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Awesome Presentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      @import url(https://cdn.jsdelivr.net/gh/tonsky/FiraCode@1.207/distr/fira_code.css);
+
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+
+      img {
+          max-width: 100%;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Fira Code'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+# Agenda
+
+- Uitleg en voorbeelden SOLID principles
+- Flash update nieuwe dingen
+
+---
+
+# Solid principles
+
+Voordelen van de SOLID principles
+
+- Testbare code
+- Onderhoudbare code
+- Uitbreidbare code
+- Leesbaardere code
+
+---
+
+# Solid
+## Single responsibility
+
+Een class zou maar een reden moeten hebben om te veranderen en maar een taak hebben
+
+### Verkeerd
+
+```c#
+class CustomerRepository
+{
+    void AddCustomer(Customer customer)
+    {
+        try {
+            db.Add(customer);
+        } catch (Exception ex) {
+            File.WriteAllText(@"C:\Error.txt", ex.ToString());
+        }
+    }
+}
+```
+---
+# Solid
+## Single responsibility
+### Goed
+
+```c#
+class CustomerRepository
+{
+    private FileLogger logger = new FileLogger();
+    void AddCustomer(Customer customer) {
+        try { db.Add(customer); }
+        catch (Exception ex) { logger.Handle(ex.ToString()); }
+    }
+}
+class FileLogger
+{
+    void Handle(string error) {
+        File.WriteAllText(@"C:\Error.txt", error);
+    }
+}
+```
+---
+
+# sOlid
+## Open-closed
+Een class zou open moeten zijn voor extensies/uitbreidingen maar gesloten voor aanpassingen
+### Verkeerd
+```c#
+class Customer
+{
+    public int CustType { get; set; }
+    public double getDiscount (double TotalSales) {
+        if (_CustType == 1) {
+            return TotalSales - 100;
+        } else {
+            return TotalSales - 50;
+        }
+    }
+}
+```
+---
+# sOlid
+## Open-closed
+### Goed
+```c#
+class Customer {
+    public virtual double getDiscount (double TotalSales) {
+        return TotalSales;
+    }
+}
+class SilverCustomer : Customer {
+    public override double getDiscount (double TotalSales) {
+        return base.getDiscount (TotalSales) - 50;
+    }
+}
+class goldCustomer : SilverCustomer {
+    public override double getDiscount (double TotalSales) {
+        return base.getDiscount (TotalSales) - 100;
+    }
+}
+```
+
+---
+
+# soLId
+## Liskov substitution
+
+Objecten zouden vervangenbaar moeten zijn voor hun subtypes
+
+### Interface segregation
+
+Een class moet niet geforceerd worden iets te implementeren dat niet word gebruikt.
+---
+# soLId
+## Liskov substitution
+
+### Verkeerd
+
+```c#
+interface Bird {
+    void Fly();
+    void Eat();
+}
+class Hawk : Bird {
+	public void Fly() { //do flying stuff }
+	public void Eat() { //do eating stuff }
+}
+class Ostrich : Bird {
+	public void Fly() { throw new Excpetion("Ostrich can't fly"); }
+	public void Eat() { //do eating stuff }
+}
+```
+
+---
+
+# soLId
+## Liskov substitution
+### Goed
+
+
+```c#
+interface Bird {
+	void Eat();
+}
+interface FlyingBird : Bird {
+	void Fly();
+}
+class Hawk : FlyingBird {
+	public void Fly() { //do flying stuff }
+	public void Eat() { //do eating stuff }
+}
+class Ostrich : Bird {
+	public void Eat() { //do eating stuff }
+}
+```
+
+---
+
+# soliD
+## Dependency Inversion
+
+Je moet niet afhankelijk zijn van implementaties maar van abstracties
+
+### Verkeerd
+
+```c#
+class FileLogger {
+    void Handle(string error) {
+        File.WriteAllText(@"C:\Error.txt", error);
+    }
+}
+internal class Customer {
+    FileLogger logger = new FileLogger(); // Bad
+    public void Add(Database db) {
+        try { db.Add(); }
+        catch (Exception error) { logger.Handle(error.ToString()); }
+    }
+}
+```
+
+---
+
+# soliD
+## Dependency Inversion
+### Goed
+
+```C#
+class BetterCustomer {
+    ILogger logger;
+    BetterCustomer(ILogger logger) { this.logger = logger; }
+    void Add(Database db) {
+        try { db.Add(); }
+        catch (Exception error) { logger.Handle(error.ToString()); }
+    }
+}
+class FileLogger : ILogger {
+    void Handle(string error) {
+        File.WriteAllText(@"C:\Error.txt", error);
+    }
+}
+interface ILogger { void Handle(string error); }
+```
+
+---
+
+# Bronnen:
+
+[Single responsibility principle](https://en.wikipedia.org/wiki/Single_responsibility_principle)
+
+[Open–closed principle](https://en.wikipedia.org/wiki/Open–closed_principle)
+
+[Liskov substitution principle](https://en.wikipedia.org/wiki/Liskov_substitution_principle)
+
+[Interface segregation principle](https://en.wikipedia.org/wiki/Interface_segregation_principle)
+
+[Dependency inversion principle](https://en.wikipedia.org/wiki/Dependency_inversion_principle)
+
+[Examples and definitions of the SOLID principles in Software Design](https://blog.scottlogic.com/2018/06/26/solid-principles.html)
+
+---
+# Flash update (Blogs/Sites)
+[.NET ](https://www.dotnetconf.net/)[Conf](https://www.dotnetconf.net/)[ (23 september – 25 september)](https://www.dotnetconf.net/)
+
+[Idea ](https://ideaminr.com/)[Miner](https://ideaminr.com/)
+
+[Blog over migratie 17 jaar oude website naar ](https://www.hanselman.com/blog/RealWorldCloudMigrationsMovingA17YearOldSeriesOfSitesFromBareMetalToAzure.aspx?WT.mc_id=twc9-c9-chwarren)[Azure](https://www.hanselman.com/blog/RealWorldCloudMigrationsMovingA17YearOldSeriesOfSitesFromBareMetalToAzure.aspx?WT.mc_id=twc9-c9-chwarren)
+
+[Visual studio lessen op ](https://devblogs.microsoft.com/visualstudio/skill-up-on-visual-studio-2019-with-pluralsight/)[Pluralsight](https://devblogs.microsoft.com/visualstudio/skill-up-on-visual-studio-2019-with-pluralsight/)
+
+[Data Engineering ](https://github.com/andkret/Cookbook)[Cookbook](https://github.com/andkret/Cookbook)
+
+[Github](https://github.blog/2019-08-08-github-actions-now-supports-ci-cd/)[ Actions CI/CD voor public ](https://github.blog/2019-08-08-github-actions-now-supports-ci-cd/)[repositories](https://github.blog/2019-08-08-github-actions-now-supports-ci-cd/)
+---
+# Flash update
+## [Remark.js](https://remarkjs.com/)
+![remark](assets/remark.png)
+---
+# Flash update (CI/CD)
+[Robots.txt ](https://robotstxt.io/docs.html)[api](https://robotstxt.io/docs.html)
+
+[Automatische ](https://performance-budgets.netlify.com/)[lighthouse](https://performance-budgets.netlify.com/)[ test van ](https://performance-budgets.netlify.com/)[netflix](https://performance-budgets.netlify.com/)
+
+[Automatische ](https://github.com/GoogleChromeLabs/lighthousebot)[lighthouse](https://github.com/GoogleChromeLabs/lighthousebot)[ tests van Google](https://github.com/GoogleChromeLabs/lighthousebot)
+
+[Snyk](https://github.com/marketplace/snyk)
+---
+# Flash update
+## [Microsoft samples](https://docs.microsoft.com/en-us/teamblog/code-samples?utm_campaign=Weekly%2BXamarin&utm_medium=email&utm_source=Weekly_Xamarin_218)
+![Samples](https://docs.microsoft.com/en-us/teamblog/media/code-samples/sample-page-new.gif)
+---
+# Flash update (Tools)
+**JS tools**
+
+[Serverless](https://faastjs.org/)[ batch computing](https://faastjs.org/) [–](https://github.com/spencermountain/compromise) Faast.js
+
+[(EN maar open source) ](https://github.com/spencermountain/compromise)[natural-language](https://github.com/spencermountain/compromise)[ processing](https://github.com/spencermountain/compromise) - Compromise
+
+[functional programming toolkit for JavaScript](https://github.com/nullobject/fkit) - Fkit
+
+**Extensions**
+
+[Editor browser scherm in ](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools)[VSCode](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools)[- ](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools)[Elements](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools)[ ](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools)[for](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools)[ ](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools)[Edge](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools)[(Chromium)](https://marketplace.visualstudio.com/items?itemName=ms-edgedevtools.vscode-edge-devtools)
+
+[CSS ](https://marketplace.visualstudio.com/items?itemName=Raathigeshan.fabulous)[Properties](https://marketplace.visualstudio.com/items?itemName=Raathigeshan.fabulous)[ ](https://marketplace.visualstudio.com/items?itemName=Raathigeshan.fabulous)[sidebar](https://marketplace.visualstudio.com/items?itemName=Raathigeshan.fabulous)[ in ](https://marketplace.visualstudio.com/items?itemName=Raathigeshan.fabulous)[VSCode](https://marketplace.visualstudio.com/items?itemName=Raathigeshan.fabulous)[– ](https://marketplace.visualstudio.com/items?itemName=Raathigeshan.fabulous)[Fabulous](https://marketplace.visualstudio.com/items?itemName=Raathigeshan.fabulous)
+
+[Markdown](https://github.com/plibither8/markdown-new-tab)[ new tab – Chrome](https://github.com/plibither8/markdown-new-tab)
+
+**Overige**
+
+[Cross ](https://avaloniaui.net/)[plaftorm](https://avaloniaui.net/)[ XAML ](https://avaloniaui.net/)[framework](https://avaloniaui.net/)[ – ](https://avaloniaui.net/)[Avalonia](https://avaloniaui.net/)
+
+[Een ](https://github.com/dotnet/HttpRepl)[repl](https://github.com/dotnet/HttpRepl)[ voor ](https://github.com/dotnet/HttpRepl)[api’s](https://github.com/dotnet/HttpRepl)[ – ](https://github.com/dotnet/HttpRepl)[HttpRepl](https://github.com/dotnet/HttpRepl)
+
+[Transparante plaatjes site – ](https://imgbin.com/)[IMGBin](https://imgbin.com/)
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
